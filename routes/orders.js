@@ -1,30 +1,18 @@
-const express = require("express");
-const Order = require("../models/Order");
-const auth = require("../middleware/auth");
-
+const express = require('express');
 const router = express.Router();
+const { protect, authorize } = require('../middleware/auth');
+const orderController = require('../controllers/orderController');
 
-// PLACE ORDER
-router.post("/", auth, async (req, res) => {
-    const { productId, quantity, totalAmount } = req.body;
+// Create an order (Customer)
+router.post('/', protect, authorize('customer'), orderController.createOrder);
 
-    try {
-        const order = new Order({
-            productId,
-            quantity,
-            totalAmount,
-            user: req.user.id
-        });
+// Get MY orders (Customer)
+router.get('/my-orders', protect, authorize('customer'), orderController.getMyOrders);
 
-        await order.save();
+// Admin: Get all orders
+router.get('/', protect, authorize('admin'), orderController.getAllOrders);
 
-        res.json({
-            message: "Order placed successfully",
-            order,
-        });
-    } catch (err) {
-        res.status(500).json({ message: "Server Error", error: err });
-    }
-});
+// Admin: Update order status
+router.put('/:id/status', protect, authorize('admin'), orderController.updateOrderStatus);
 
 module.exports = router;
