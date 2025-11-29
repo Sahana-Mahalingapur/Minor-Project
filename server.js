@@ -28,13 +28,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/upload', uploadRoutes);   // ⭐ ADD THIS LINE
+app.use('/api/upload', uploadRoutes);
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Error handler
 app.use(errorHandler);
 
 // Connect to DB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB connected');
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Care | Fresh Produce</title>
+  <link rel="stylesheet" href="consumer.css">
+</head>
+
+<body>
+
+  <header>
+    <nav style="margin-bottom: 20px;">
+      <a href="home.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: 600;">Home</a>
+      <a href="contact.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: 600;">Contact</a>
+      <a href="about.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: 600;">About</a>
+      <a href="#" id="logoutBtn"
+        style="color: white; margin: 0 15px; text-decoration: none; font-weight: 600;">Logout</a>
+    </nav>
+    <h1>Welcome to Farm Care 🍎🥕</h1>
+    <p>Buy fresh fruits and vegetables directly from local farmers!</p>
+
+    <!-- 🔍 Search Bar -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search for fruits or vegetables...">
+      <button id="micBtn">🎙️</button>
+      <button id="cameraBtn">📷</button>
+    </div>
+  </header>
+
+  <section>
+    <h2>🍉 Fruits</h2>
+    <div id="fruitsContainer" class="product-container"></div>
+  </section>
+
+  <section>
+    <h2>🥦 Vegetables</h2>
+    <div id="veggiesContainer" class="product-container"></div>
+  </section>
+
+  <section>
+    <h2>🥛 Fresh Produce & Others</h2>
+    <div id="otherContainer" class="product-container"></div>
+  </section>
+
+  <footer>
+    <p>© 2025 Farm Care | Eat Healthy, Stay Fresh</p>
+  </footer>
+
+  <script src="product.js"></script>
+  <script>
+    // Logout functionality
+    document.getElementById("logoutBtn").addEventListener("click", function (e) {
+      e.preventDefault();
+      localStorage.clear();
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+
+</html>

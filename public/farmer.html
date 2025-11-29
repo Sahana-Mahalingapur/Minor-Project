@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard - FarmCare</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: #28a745;
+        }
+
+        button#logoutBtn {
+            padding: 0.5rem 1rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .container {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .form-section {
+            flex: 1;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-section {
+            flex: 2;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button.add-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .product-card {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-info h3 {
+            margin: 0 0 0.5rem 0;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Farmer Dashboard 🚜</h1>
+        <div id="userInfo"></div>
+        <button id="logoutBtn">Logout</button>
+    </header>
+
+    <div class="container">
+        <!-- Add Product Form -->
+        <div class="form-section">
+            <h3>Add New Product</h3>
+            <form id="addProductForm">
+                <input type="text" id="pName" placeholder="Product Name" required />
+                <textarea id="pDesc" placeholder="Description" required></textarea>
+                <input type="number" id="pPrice" placeholder="Price (₹)" required />
+                <input type="number" id="pStock" placeholder="Stock Quantity" required />
+                <select id="pCategory" required>
+                    <option value="">Select Category</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Grains">Grains</option>
+                    <option value="Other">Other</option>
+                </select>
+                <button type="submit" class="add-btn">Add Product</button>
+            </form>
+        </div>
+
+        <!-- My Products List -->
+        <div class="list-section">
+            <h3>My Products</h3>
+            <div id="productsList">
+                <p>Loading products...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="farmer.js"></script>
+</body>
+
+</html>

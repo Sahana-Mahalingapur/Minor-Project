@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Farm Care | Login</title>
+  <link rel="stylesheet" href="login.css" />
+</head>
+
+<body>
+  <div class="login-container">
+    <h1>Farm Care 🌿</h1>
+    <p>Connecting Farmers and Consumers — Freshness You Can Trust</p>
+
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Enter Username" required />
+
+      <input type="email" id="email" placeholder="Enter Email" required />
+
+      <!-- 📌 Added Contact Number -->
+      <input type="text" id="contact" placeholder="Enter Contact Number" required />
+
+      <input type="password" id="password" placeholder="Enter Password" required />
+
+      <select id="userType" required>
+        <option value="" disabled selected>Login as</option>
+        <option value="farmer">Farmer</option>
+        <option value="consumer">Consumer</option>
+      </select>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p class="footer-text">
+      Don’t have an account? <a href="signup.html">Sign Up</a>
+    </p>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const contact = document.getElementById("contact").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const userType = document.getElementById("userType").value;
+
+      // Email Validation
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        alert("❌ Please enter a valid Email ID.");
+        return;
+      }
+
+      // Contact Validation (10 digits only)
+      const contactPattern = /^[0-9]{10}$/;
+      if (!contactPattern.test(contact)) {
+        alert("❌ Contact number must be exactly 10 digits.");
+        return;
+      }
+
+      // Password empty check
+      if (password.length === 0) {
+        alert("❌ Password cannot be empty.");
+        return;
+      }
+
+      // User Type validation
+      if (userType === "") {
+        alert("❌ Please select user type.");
+        return;
+      }
+
+      // Save data
+      localStorage.setItem("username", username);
+      localStorage.setItem("email", email);
+      localStorage.setItem("contact", contact);
+      localStorage.setItem("userType", userType);
+
+      // Redirect to home
+      // Redirect based on user type
+      if (userType === "farmer") {
+        window.location.href = "farmers.html";
+      } else {
+        window.location.href = "consumer.html";
+      }
+    });
+  </script>
+</body>
+
+</html>
