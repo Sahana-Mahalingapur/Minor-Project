@@ -27,6 +27,22 @@
                 <label for="produce-name">Produce Name:</label>
                 <input type="text" id="produce-name" placeholder="e.g. Mangoes, Tomatoes" required />
 
+                <label for="produce-price">Price (₹ per kg/unit):</label>
+                <input type="number" id="produce-price" placeholder="e.g. 50" required />
+
+                <label for="produce-category">Category:</label>
+                <select id="produce-category" required>
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Grains">Grains</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <label for="produce-desc">Description:</label>
+                <textarea id="produce-desc" rows="3" placeholder="Describe your produce..." required></textarea>
+
                 <label for="harvest-date">Harvest Date:</label>
                 <input type="date" id="harvest-date" required />
 
@@ -40,7 +56,7 @@
                 <label for="produce-image">Upload Produce Image:</label>
                 <input type="file" id="produce-image" accept="image/*" required />
 
-                <button type="submit">Upload </button>
+                <button type="submit">Upload Produce</button>
             </form>
         </section>
 
@@ -58,6 +74,14 @@
     </footer>
 
     <script>
+        // Check Authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
         // Update freshness value display
         function updateFreshness(val) {
             const valueText = document.getElementById("freshness-value");
@@ -69,40 +93,75 @@
         const form = document.getElementById("uploadForm");
         const previewGrid = document.getElementById("preview-grid");
 
+        // 📌 Handle Form Submission
         form.addEventListener("submit", (e) => {
             e.preventDefault();
 
-            const name = document.getElementById("produce-name").value;
-            const date = document.getElementById("harvest-date").value;
+            // Get input values
+            const fileInput = document.getElementById("produce-image");
+            const file = fileInput.files[0];
+            const produceName = document.getElementById("produce-name").value;
+            const producePrice = document.getElementById("produce-price").value;
+            const produceCategory = document.getElementById("produce-category").value;
+            const produceDesc = document.getElementById("produce-desc").value;
+            const harvestDate = document.getElementById("harvest-date").value;
             const freshness = document.getElementById("freshness").value;
-            const file = document.getElementById("produce-image").files[0];
 
-            if (!file) return alert("Please upload an image!");
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const imageSrc = e.target.result;
+            if (!produceName || !producePrice || !produceCategory || !produceDesc || !harvestDate || !freshness) {
+                alert('Please fill in all fields');
+                return;
+            }
 
-                // Create a new card dynamically
-                const card = document.createElement("div");
-                card.classList.add("card");
-                card.innerHTML = `
-          <img src="${imageSrc}" alt="${name}">
-          <h4>${name}</h4>
-          <p>Harvested: ${date}</p>
-          <p>Freshness: ${freshness}/10 🌿</p>
-        `;
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const imageUrl = event.target.result;
 
-                previewGrid.prepend(card); // Add to top
-                form.reset();
-                document.getElementById("freshness-value").textContent = "8 / 10 🌱";
-            };
-            reader.readAsDataURL(file);
+                    // Create Product Element
+                    const productEl = document.createElement("div");
+                    productEl.classList.add("card"); // Using existing 'card' class for consistency
+                    productEl.innerHTML = `
+            <img src="${imageUrl}" alt="${produceName}">
+            <h4>${produceName}</h4>
+            <p>₹${producePrice} / kg</p>
+            <p>Freshness: ${freshness}/10 🌿</p>
+            <p class="date">Harvested: ${new Date(harvestDate).toLocaleDateString()}</p>
+            <button onclick="this.parentElement.remove()" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-top: 10px;">Delete</button>
+          `;
+
+                    // Append to My Products section
+                    previewGrid.prepend(productEl);
+
+                    // Reset Form
+                    form.reset();
+                    document.getElementById("freshness-value").textContent = "8 / 10 🌱"; // Reset freshness display
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("Please upload an image!");
+            }
         });
+
+        function prependProduct(product) {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <h4>${product.name}</h4>
+                <p>₹${product.price} / kg</p>
+                <p>Freshness: ${product.freshness}/10 🌿</p>
+                <p class="date">Harvested: ${new Date(product.harvestDate).toLocaleDateString()}</p>
+            `;
+            previewGrid.prepend(card);
+        }
+
+        // Load existing products (Optional: for now just showing new uploads)
+        // You can implement a fetch loop here if you want to show previous uploads.
 
         // Logout functionality
         document.getElementById("logout-btn").addEventListener("click", function (e) {
-            e.preventDefault(); // Prevent default anchor behavior
+            e.preventDefault();
             localStorage.clear();
             window.location.href = "login.html";
         });

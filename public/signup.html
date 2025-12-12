@@ -38,7 +38,7 @@
   </div>
 
   <script>
-    document.getElementById("signupForm").addEventListener("submit", function (event) {
+    document.getElementById("signupForm").addEventListener("submit", async function (event) {
       event.preventDefault();
 
       const username = document.getElementById("username").value.trim();
@@ -71,11 +71,20 @@
         return;
       }
 
-      // Store values
+      // Store values for Session
       localStorage.setItem("username", username);
       localStorage.setItem("email", email);
       localStorage.setItem("contact", contact);
       localStorage.setItem("userType", userType);
+
+      // 🔐 Store detailed user for Login Validation (matches Login check)
+      localStorage.setItem("registeredUser", JSON.stringify({
+        name: username,
+        email: email,
+        phone: contact,
+        password: password, // In a real app, NEVER save plain text passwords!
+        role: userType
+      }));
 
       // Redirect
       // Redirect based on user type

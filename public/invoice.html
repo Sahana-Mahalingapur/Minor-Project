@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm Care | Invoice</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Care | Invoice</title>
 </head>
 
 <body style="
@@ -15,91 +15,179 @@
   color:#2d572c;
 ">
 
-    <h1 style="text-align:center;">🧾 Farm Care Invoice</h1>
-    <p style="text-align:center;">Thank you for your order! 😊</p>
-    <hr><br>
+  <h1 style="text-align:center;">🧾 Farm Care Invoice</h1>
+  <p style="text-align:center;">Thank you for your order! 😊</p>
+  <hr><br>
 
-    <h2>Customer Details</h2>
-    <p><b>Name:</b> <span id="custName"></span></p>
-    <p><b>Email:</b> <span id="custEmail"></span></p>
-    <p><b>Contact:</b> <span id="custPhone"></span></p>
-    <p><b>Order Time:</b> <span id="orderTime"></span></p>
+  <h2>Customer Details</h2>
+  <p><b>Name:</b> <span id="custName"></span></p>
+  <p><b>Email:</b> <span id="custEmail"></span></p>
+  <p><b>Contact:</b> <span id="custPhone"></span></p>
+  <p><b>Order Time:</b> <span id="orderTime"></span></p>
 
-    <hr><br>
+  <hr><br>
 
-    <h2>Order Summary</h2>
-    <table style="width:100%; border-collapse:collapse;">
-        <thead>
-            <tr style="background:#e8f5e9;">
-                <th style="padding:10px; border:1px solid #2d572c;">Item</th>
-                <th style="padding:10px; border:1px solid #2d572c;">Qty</th>
-                <th style="padding:10px; border:1px solid #2d572c;">Unit Price</th>
-                <th style="padding:10px; border:1px solid #2d572c;">Total</th>
-            </tr>
-        </thead>
-        <tbody id="invoiceBody"></tbody>
-    </table>
+  <h2>Order Summary</h2>
+  <table style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr style="background:#e8f5e9;">
+        <th style="padding:10px; border:1px solid #2d572c;">Item</th>
+        <th style="padding:10px; border:1px solid #2d572c;">Qty</th>
+        <th style="padding:10px; border:1px solid #2d572c;">Unit Price</th>
+        <th style="padding:10px; border:1px solid #2d572c;">Total</th>
+      </tr>
+    </thead>
+    <tbody id="invoiceBody"></tbody>
+  </table>
 
-    <h2 style="text-align:right; margin-top:20px;">
-        Grand Total: ₹<span id="grandTotal"></span>
-    </h2>
+  <h2 style="text-align:right; margin-top:20px;">
+    Grand Total: ₹<span id="grandTotal"></span>
+  </h2>
 
-    <br>
-    <hr>
+  <br>
+  <hr>
 
-    <div style="text-align:center; margin-top:20px;">
-        <button onclick="window.print()" style="
-      background:#2d572c; 
-      color:white; 
-      padding:10px 20px; 
-      border:none; 
-      border-radius:8px;
-      cursor:pointer;
-      font-size:16px;
-    ">Print Invoice 🖨</button>
+  <!-- PAYMENT & ACTIONS SECTION -->
+  <div style="text-align:center; margin-top:20px;">
 
-        <button onclick="window.location.href='consumer.html'" style="
-      background:#888; 
-      color:white; 
-      padding:10px 20px; 
-      border:none; 
-      border-radius:8px;
-      cursor:pointer;
-      font-size:16px;
-      margin-left:10px;
-    ">Back to Home</button>
+    <!-- Step 1: Payment -->
+    <div id="paymentSection">
+      <p style="margin-bottom:10px; font-style:italic;">Please make payment to complete the order.</p>
+      <button onclick="processPayment()" style="
+        background:#e67e22; 
+        color:white; 
+        padding:12px 25px; 
+        border:none; 
+        border-radius:8px;
+        cursor:pointer;
+        font-size:18px;
+        font-weight:bold;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      ">💳 Pay Now</button>
     </div>
 
-    <script>
-        // Load order
-        const order = JSON.parse(localStorage.getItem("orderData")) || [];
-        const orderTime = localStorage.getItem("orderTime");
+    <!-- Step 2: Post-Payment Actions (Hidden initially) -->
+    <div id="actionSection" style="display:none;">
+      <p style="color:green; font-weight:bold; margin-bottom:10px;">✅ Payment Successful!</p>
 
-        // Load customer info
-        document.getElementById("custName").innerText = localStorage.getItem("username") || "Not Provided";
-        document.getElementById("custEmail").innerText = localStorage.getItem("email") || "Not Provided";
-        document.getElementById("custPhone").innerText = localStorage.getItem("contact") || "Not Provided";
-        document.getElementById("orderTime").innerText = orderTime;
+      <button onclick="window.print()" style="
+        background:#2d572c; 
+        color:white; 
+        padding:10px 20px; 
+        border:none; 
+        border-radius:8px;
+        cursor:pointer;
+        font-size:16px;
+      ">Print Invoice 🖨</button>
 
-        // Fill invoice table
-        let grandTotal = 0;
-        const tbody = document.getElementById("invoiceBody");
+      <button onclick="finishOrder()" style="
+        background:#888; 
+        color:white; 
+        padding:10px 20px; 
+        border:none; 
+        border-radius:8px;
+        cursor:pointer;
+        font-size:16px;
+        margin-left:10px;
+      ">Back to Home 🏠</button>
+    </div>
 
-        order.forEach(item => {
-            grandTotal += item.totalCost;
+  </div>
 
-            tbody.innerHTML += `
-        <tr>
-          <td style="padding:10px; border:1px solid #2d572c;">${item.name}</td>
-          <td style="padding:10px; border:1px solid #2d572c;">${item.quantity}</td>
-          <td style="padding:10px; border:1px solid #2d572c;">₹${item.unitPrice}</td>
-          <td style="padding:10px; border:1px solid #2d572c;">₹${item.totalCost}</td>
-        </tr>
-      `;
-        });
+  <!-- Razorpay SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-        document.getElementById("grandTotal").innerText = grandTotal;
-    </script>
+  <script>
+    // Load order
+    const order = JSON.parse(localStorage.getItem("orderData")) || [];
+    const orderTime = localStorage.getItem("orderTime");
+
+    // Load customer info
+    const custName = localStorage.getItem("username") || "Guest Consumer";
+    const custEmail = localStorage.getItem("email") || "guest@example.com";
+    const custPhone = localStorage.getItem("contact") || "9999999999";
+
+    document.getElementById("custName").innerText = custName;
+    document.getElementById("custEmail").innerText = custEmail;
+    document.getElementById("custPhone").innerText = custPhone;
+    document.getElementById("orderTime").innerText = orderTime;
+
+    // Fill invoice table
+    let grandTotal = 0;
+    const tbody = document.getElementById("invoiceBody");
+
+    if (order.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>No items in order.</td></tr>";
+    } else {
+      order.forEach(item => {
+        grandTotal += item.totalCost;
+
+        tbody.innerHTML += `
+          <tr>
+            <td style="padding:10px; border:1px solid #2d572c;">${item.name}</td>
+            <td style="padding:10px; border:1px solid #2d572c;">${item.quantity}</td>
+            <td style="padding:10px; border:1px solid #2d572c;">₹${item.unitPrice}</td>
+            <td style="padding:10px; border:1px solid #2d572c;">₹${item.totalCost}</td>
+          </tr>
+        `;
+      });
+    }
+
+    document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
+
+    // --- RAZORPAY PAYMENT LOGIC ---
+
+    function processPayment() {
+      if (grandTotal <= 0) {
+        alert("Order is empty or total is zero!");
+        return;
+      }
+
+      // Razorpay Configuration
+      var options = {
+        "key": "rzp_test_RaNi4b2fzG2SRr", // 👈 User's Test Key
+        "amount": Math.round(grandTotal * 100).toString(), // Amount in paise (multiply by 100)
+        "currency": "INR",
+        "name": "Farm Care",
+        "description": "Payment for Fresh Produce",
+        "image": "https://cdn-icons-png.flaticon.com/512/3729/3729188.png", // Optional: Logo
+        "handler": function (response) {
+          // Payment Success Handler
+          console.log("Payment ID: " + response.razorpay_payment_id);
+
+          alert("✅ Payment Successful!\nTrans ID: " + response.razorpay_payment_id);
+
+          // Switch UI to Success State
+          document.getElementById("paymentSection").style.display = "none";
+          document.getElementById("actionSection").style.display = "block";
+        },
+        "prefill": {
+          "name": custName,
+          "email": custEmail,
+          "contact": custPhone
+        },
+        "theme": {
+          "color": "#2d572c" // Match FarmCare green
+        }
+      };
+
+      var rzp1 = new Razorpay(options);
+
+      // Handle Payment Failures
+      rzp1.on('payment.failed', function (response) {
+        alert("❌ Payment Failed: " + response.error.description);
+      });
+
+      rzp1.open();
+    }
+
+    function finishOrder() {
+      // Clear order data
+      localStorage.removeItem("orderData");
+      localStorage.removeItem("orderTime");
+      window.location.href = 'consumer.html';
+    }
+  </script>
 
 </body>
 

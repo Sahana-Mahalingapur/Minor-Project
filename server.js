@@ -37,13 +37,10 @@ app.get('/', (req, res) => {
 // Error handler
 app.use(errorHandler);
 
-// Connect to DB
+// Connect to DB (Non-blocking)
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch(err => {
-    console.error('DB connection error', err);
-    process.exit(1);
-  });
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('DB connection error (Server running without DB):', err.message));
+
+// Start Server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
