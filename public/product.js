@@ -161,10 +161,7 @@ async function loadProducts() {
 // Initial Load
 loadProducts();
 
-// Placeholder cart function
-function addToCart(name, price) {
-  alert(`Added ${name} directly to your cart!`);
-}
+// (Placeholder removed)
 
 
 // 🔍 Search functionality
@@ -196,7 +193,10 @@ if (micBtn) {
     recognition.start();
 
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
+      let transcript = event.results[0][0].transcript;
+      // Remove trailing period often added by speech recognition
+      transcript = transcript.replace(/\.$/, "");
+
       searchInput.value = transcript;
       searchInput.dispatchEvent(new Event("input"));
     };
@@ -218,7 +218,7 @@ const modalHTML = `
 </div>
 
 <!-- QUANTITY MODAL -->
-<div id="qtyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; display:flex; justify-content:center; align-items:center;">
+<div id="qtyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
   <div style="background:white; padding:20px; width:300px; text-align:center; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
     <h3 style="margin-top:0;">Quantity</h3>
     <input type="number" id="qtyInput" placeholder="1" value="1" min="1" style="width:60px; padding:8px; text-align:center; font-size:18px; margin:15px 0; border:1px solid #ccc; border-radius:5px;">
@@ -237,7 +237,7 @@ const modalHTML = `
 </button>
 
 <!-- CART MODAL -->
-<div id="cartModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; display:flex; justify-content:center; align-items:center;">
+<div id="cartModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
   <div style="background:white; padding:25px; width:90%; max-width:450px; border-radius:12px; max-height:85vh; overflow-y:auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
       <h2 style="margin:0;">Your Cart 🛒</h2>
@@ -377,7 +377,7 @@ function loadCartItems() {
   });
 
   grandTotalSpan.innerText = grandTotal;
-  placeOrderBtn.innerText = `Checkout • ₹${grandTotal}`;
+  placeOrderBtn.innerText = `Pay Now • ₹${grandTotal}`; // Updated Label
   totalSection.style.display = "block";
 }
 
@@ -392,21 +392,69 @@ window.removeItem = function (index) {
   }
 }
 
-// PLACE ORDER → Invoice
+// PLACE ORDER → PAY → INVOICE
 document.getElementById("placeOrderBtn").onclick = function () {
   if (cart.length === 0) {
     showPopup("Cart is empty!");
     return;
   }
 
-  localStorage.setItem("orderData", JSON.stringify(cart));
-  localStorage.setItem("orderTime", new Date().toLocaleString());
+  // Calculate Total
+  const totalAmount = cart.reduce((acc, item) => acc + item.totalCost, 0);
 
-  showPopup("🎉 Order placed!");
+  if (totalAmount <= 0) {
+    alert("Invalid Order Amount");
+    return;
+  }
 
-  setTimeout(() => {
-    window.location.href = "invoice.html";
-  }, 1200);
+  // User details for payment
+  const custName = localStorage.getItem("username") || "Guest";
+  const custEmail = localStorage.getItem("email") || "guest@example.com";
+  const custContact = localStorage.getItem("contact") || "9999999999";
+
+  // Razorpay Options
+  var options = {
+    "key": "rzp_test_RaNi4b2fzG2SRr", // Test Key
+    "amount": Math.round(totalAmount * 100).toString(), // Paise
+    "currency": "INR",
+    "name": "Farm Care",
+    "description": "Order Payment",
+    "image": "https://cdn-icons-png.flaticon.com/512/3729/3729188.png",
+    "handler": function (response) {
+      // ✅ Payment Success
+      console.log("Payment ID: " + response.razorpay_payment_id);
+
+      // Save Order & Payment Info
+      localStorage.setItem("orderData", JSON.stringify(cart));
+      localStorage.setItem("orderTime", new Date().toLocaleString());
+      localStorage.setItem("paymentId", response.razorpay_payment_id); // Save payment ID
+
+      showToast("✅ Payment Successful! Generating Invoice...");
+
+      setTimeout(() => {
+        window.location.href = "invoice.html";
+      }, 1500);
+    },
+    "prefill": {
+      "name": custName,
+      "email": custEmail,
+      "contact": custContact
+    },
+    "theme": {
+      "color": "#2d572c"
+    }
+  };
+
+  try {
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response) {
+      alert("❌ Payment Failed: " + response.error.description);
+    });
+    rzp1.open();
+  } catch (e) {
+    alert("❌ Payment Error: Razorpay not loaded. Check connection.");
+    console.error(e);
+  }
 };
 
 // 📷 Camera Access

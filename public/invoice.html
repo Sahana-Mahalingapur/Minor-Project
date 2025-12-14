@@ -47,60 +47,44 @@
   <br>
   <hr>
 
-  <!-- PAYMENT & ACTIONS SECTION -->
-  <div style="text-align:center; margin-top:20px;">
+  <br>
+  <hr>
 
-    <!-- Step 1: Payment -->
-    <div id="paymentSection">
-      <p style="margin-bottom:10px; font-style:italic;">Please make payment to complete the order.</p>
-      <button onclick="processPayment()" style="
-        background:#e67e22; 
+  <p style="text-align:center; font-style:italic; margin-top:10px;">
+    Status: <strong style="color:green;">PAID ✅</strong><br>
+    <span id="paymentIdDisplay" style="font-size:12px; color:#555;"></span>
+  </p>
+
+  <!-- ACTIONS SECTION -->
+  <div style="text-align:center; margin-top:20px;">
+    <button onclick="window.print()" style="
+        background:#2d572c; 
         color:white; 
         padding:12px 25px; 
         border:none; 
         border-radius:8px;
         cursor:pointer;
-        font-size:18px;
-        font-weight:bold;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      ">💳 Pay Now</button>
-    </div>
-
-    <!-- Step 2: Post-Payment Actions (Hidden initially) -->
-    <div id="actionSection" style="display:none;">
-      <p style="color:green; font-weight:bold; margin-bottom:10px;">✅ Payment Successful!</p>
-
-      <button onclick="window.print()" style="
-        background:#2d572c; 
-        color:white; 
-        padding:10px 20px; 
-        border:none; 
-        border-radius:8px;
-        cursor:pointer;
         font-size:16px;
+        margin: 10px;
       ">Print Invoice 🖨</button>
 
-      <button onclick="finishOrder()" style="
+    <button onclick="finishOrder()" style="
         background:#888; 
         color:white; 
-        padding:10px 20px; 
+        padding:12px 25px; 
         border:none; 
         border-radius:8px;
         cursor:pointer;
         font-size:16px;
-        margin-left:10px;
+        margin: 10px;
       ">Back to Home 🏠</button>
-    </div>
-
   </div>
-
-  <!-- Razorpay SDK -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <script>
     // Load order
     const order = JSON.parse(localStorage.getItem("orderData")) || [];
     const orderTime = localStorage.getItem("orderTime");
+    const paymentId = localStorage.getItem("paymentId") || "N/A";
 
     // Load customer info
     const custName = localStorage.getItem("username") || "Guest Consumer";
@@ -111,6 +95,12 @@
     document.getElementById("custEmail").innerText = custEmail;
     document.getElementById("custPhone").innerText = custPhone;
     document.getElementById("orderTime").innerText = orderTime;
+
+    // Show Payment ID
+    const pidDisplay = document.getElementById("paymentIdDisplay");
+    if (pidDisplay && paymentId !== "N/A") {
+      pidDisplay.innerText = "Transaction ID: " + paymentId;
+    }
 
     // Fill invoice table
     let grandTotal = 0;
@@ -135,56 +125,11 @@
 
     document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
 
-    // --- RAZORPAY PAYMENT LOGIC ---
-
-    function processPayment() {
-      if (grandTotal <= 0) {
-        alert("Order is empty or total is zero!");
-        return;
-      }
-
-      // Razorpay Configuration
-      var options = {
-        "key": "rzp_test_RaNi4b2fzG2SRr", // 👈 User's Test Key
-        "amount": Math.round(grandTotal * 100).toString(), // Amount in paise (multiply by 100)
-        "currency": "INR",
-        "name": "Farm Care",
-        "description": "Payment for Fresh Produce",
-        "image": "https://cdn-icons-png.flaticon.com/512/3729/3729188.png", // Optional: Logo
-        "handler": function (response) {
-          // Payment Success Handler
-          console.log("Payment ID: " + response.razorpay_payment_id);
-
-          alert("✅ Payment Successful!\nTrans ID: " + response.razorpay_payment_id);
-
-          // Switch UI to Success State
-          document.getElementById("paymentSection").style.display = "none";
-          document.getElementById("actionSection").style.display = "block";
-        },
-        "prefill": {
-          "name": custName,
-          "email": custEmail,
-          "contact": custPhone
-        },
-        "theme": {
-          "color": "#2d572c" // Match FarmCare green
-        }
-      };
-
-      var rzp1 = new Razorpay(options);
-
-      // Handle Payment Failures
-      rzp1.on('payment.failed', function (response) {
-        alert("❌ Payment Failed: " + response.error.description);
-      });
-
-      rzp1.open();
-    }
-
     function finishOrder() {
       // Clear order data
       localStorage.removeItem("orderData");
       localStorage.removeItem("orderTime");
+      localStorage.removeItem("paymentId");
       window.location.href = 'consumer.html';
     }
   </script>

@@ -76,6 +76,7 @@
       localStorage.setItem("email", email);
       localStorage.setItem("contact", contact);
       localStorage.setItem("userType", userType);
+      localStorage.setItem("token", "local-demo-token"); // Set dummy token to bypass auth checks in farmers.html
 
       // 🔐 Store detailed user for Login Validation (matches Login check)
       localStorage.setItem("registeredUser", JSON.stringify({

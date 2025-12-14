@@ -24,39 +24,71 @@
             <p>Share your farmers freshest harvest with consumers directly!</p>
 
             <form id="uploadForm">
-                <label for="produce-name">Produce Name:</label>
-                <input type="text" id="produce-name" placeholder="e.g. Mangoes, Tomatoes" required />
 
-                <label for="produce-price">Price (₹ per kg/unit):</label>
-                <input type="number" id="produce-price" placeholder="e.g. 50" required />
-
-                <label for="produce-category">Category:</label>
-                <select id="produce-category" required>
-                    <option value="" disabled selected>Select Category</option>
-                    <option value="Vegetables">Vegetables</option>
-                    <option value="Fruits">Fruits</option>
-                    <option value="Dairy">Dairy</option>
-                    <option value="Grains">Grains</option>
-                    <option value="Other">Other</option>
-                </select>
-
-                <label for="produce-desc">Description:</label>
-                <textarea id="produce-desc" rows="3" placeholder="Describe your produce..." required></textarea>
-
-                <label for="harvest-date">Harvest Date:</label>
-                <input type="date" id="harvest-date" required />
-
-                <label for="freshness">Freshness Scale (1–10):</label>
-                <div class="freshness-scale">
-                    <input type="range" id="freshness" min="1" max="10" value="8"
-                        oninput="updateFreshness(this.value)" />
-                    <span id="freshness-value">8 / 10 🌱</span>
+                <!-- Group 1: Produce Name -->
+                <div style="margin-bottom: 15px;">
+                    <label for="produce-name" style="display:block; margin-bottom:5px; font-weight:bold;">Produce
+                        Name:</label>
+                    <input type="text" id="produce-name" placeholder="e.g. Mangoes 🥭" required
+                        style="width: 100%; box-sizing: border-box;" />
                 </div>
 
-                <label for="produce-image">Upload Produce Image:</label>
-                <input type="file" id="produce-image" accept="image/*" required />
+                <!-- Group 2: Category & Harvest Date (Row) -->
+                <div style="margin-bottom: 15px;">
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label for="produce-category"
+                                style="display:block; margin-bottom:5px; font-weight:bold;">Category:</label>
+                            <select id="produce-category" required
+                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;">
+                                <option value="" disabled selected>Select Category</option>
+                                <option value="Vegetables">Vegetables 🥦</option>
+                                <option value="Fruits">Fruits 🍎</option>
+                                <option value="Dairy">Dairy 🥛</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="harvest-date"
+                                style="display:block; margin-bottom:5px; font-weight:bold;">Harvest Date:</label>
+                            <input type="date" id="harvest-date" required
+                                style="width: 100%; box-sizing: border-box;" />
+                        </div>
+                    </div>
+                </div>
 
-                <button type="submit">Upload Produce</button>
+                <!-- Group 3: Description -->
+                <div style="margin-bottom: 15px;">
+                    <label for="produce-desc"
+                        style="display:block; margin-bottom:5px; font-weight:bold;">Description:</label>
+                    <textarea id="produce-desc" rows="3"
+                        placeholder="Describe your produce (e.g. Organic, fresh picked)..." required
+                        style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-family: inherit;"></textarea>
+                </div>
+
+                <!-- Group 4: Freshness -->
+                <div style="margin-bottom: 15px;">
+                    <label for="freshness" style="display:block; margin-bottom:5px; font-weight:bold;">Freshness Scale
+                        (1–10):</label>
+                    <div class="freshness-scale"
+                        style="background:#e8f5e9; padding: 10px; border-radius: 10px; display:flex; align-items:center;">
+                        <input type="range" id="freshness" min="1" max="10" value="8"
+                            style="margin-bottom: 0; flex:1; margin-right:10px;"
+                            oninput="updateFreshness(this.value)" />
+                        <span id="freshness-value" style="font-size: 1.2rem; min-width:80px; text-align:right;">8 / 10
+                            🌱</span>
+                    </div>
+                </div>
+
+                <!-- Group 5: Image -->
+                <div style="margin-bottom: 20px;">
+                    <label for="produce-image" style="display:block; margin-bottom:5px; font-weight:bold;">Upload
+                        Produce Image:</label>
+                    <input type="file" id="produce-image" accept="image/*" required
+                        style="border: 2px dashed #2d572c; background: #f0fdf4; width: 100%; box-sizing: border-box; padding:10px;" />
+                </div>
+
+                <button type="submit" style="width: 100%; font-size: 1.2rem;">🚀 Upload Produce</button>
             </form>
         </section>
 
@@ -101,14 +133,14 @@
             const fileInput = document.getElementById("produce-image");
             const file = fileInput.files[0];
             const produceName = document.getElementById("produce-name").value;
-            const producePrice = document.getElementById("produce-price").value;
+            // Price removed as per request
             const produceCategory = document.getElementById("produce-category").value;
             const produceDesc = document.getElementById("produce-desc").value;
             const harvestDate = document.getElementById("harvest-date").value;
             const freshness = document.getElementById("freshness").value;
 
 
-            if (!produceName || !producePrice || !produceCategory || !produceDesc || !harvestDate || !freshness) {
+            if (!produceName || !produceCategory || !produceDesc || !harvestDate || !freshness) {
                 alert('Please fill in all fields');
                 return;
             }
@@ -124,7 +156,7 @@
                     productEl.innerHTML = `
             <img src="${imageUrl}" alt="${produceName}">
             <h4>${produceName}</h4>
-            <p>₹${producePrice} / kg</p>
+            <span style="display:block; text-align:center; color:#555; font-size:0.9rem; margin-bottom:5px;">${produceCategory}</span>
             <p>Freshness: ${freshness}/10 🌿</p>
             <p class="date">Harvested: ${new Date(harvestDate).toLocaleDateString()}</p>
             <button onclick="this.parentElement.remove()" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-top: 10px;">Delete</button>
@@ -162,7 +194,13 @@
         // Logout functionality
         document.getElementById("logout-btn").addEventListener("click", function (e) {
             e.preventDefault();
-            localStorage.clear();
+            // Only clear session data, keep registered account!
+            localStorage.removeItem("username");
+            localStorage.removeItem("email");
+            localStorage.removeItem("contact");
+            localStorage.removeItem("userType");
+            localStorage.removeItem("token");
+
             window.location.href = "login.html";
         });
     </script>

@@ -48,12 +48,21 @@
     <p>© 2025 Farm Care | Eat Healthy, Stay Fresh</p>
   </footer>
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="product.js"></script>
   <script>
     // Logout functionality
+    // Logout functionality
     document.getElementById("logoutBtn").addEventListener("click", function (e) {
       e.preventDefault();
-      localStorage.clear();
+      // Only clear session data, keep registered account!
+      localStorage.removeItem("username");
+      localStorage.removeItem("email"); // This is the session email
+      localStorage.removeItem("contact");
+      localStorage.removeItem("userType");
+      localStorage.removeItem("token");
+      // Do NOT remove 'registeredUser'
+
       window.location.href = "login.html";
     });
   </script>

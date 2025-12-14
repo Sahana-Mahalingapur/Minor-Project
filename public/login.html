@@ -73,45 +73,44 @@
         return;
       }
 
-      // 🔐 Simple Local Validation
-      // Check if this user was registered (signup saves to 'user_db' or similar key in real apps, 
-      // but here we just have 'token' or 'user' object if we were using DB.
-      // Since we reverted to NO-DB per your request, we can't 'validate' against a list unless we save one.
-
-      // OPTION: We will just simulate a check or assume signup just happened.
-
-      // ⚠️ CRITICAL: You asked for "Local Storage" mode earlier.
-      // In this mode, without a backend, there is NOWHERE to check the password against
-      // unless you signed up on this same browser just now.
-
-      // Let's try to check against the last signed-up user if available.
+      // 🔐 STRICT Local Validation
       const storedUser = JSON.parse(localStorage.getItem('registeredUser'));
 
-      // If we want to enforce password check:
-      if (storedUser) {
-        if (storedUser.email === email && storedUser.password === password) {
-          // Success
+      if (!storedUser) {
+        alert("❌ No registered user found. Please Sign Up first!");
+        return;
+      }
+
+      if (storedUser.email === email) {
+        if (storedUser.password === password) {
+          // ✅ Success: Login
           localStorage.setItem("username", storedUser.name);
-          // Proceed below...
-        } else if (storedUser.email === email && storedUser.password !== password) {
+        } else {
+          // ❌ Wrong Password
           alert("❌ Incorrect Password!");
           return;
-        } else {
-          // New user or different email, for now we allow login as it's a demo
-          // or alert "User not found"
-          // alert("❌ User not found. Please Sign Up first.");
-          // return;
         }
+      } else {
+        // ❌ Wrong Email
+        alert("❌ User not found with this email.");
+        return;
       }
 
       // Save session data
-      localStorage.setItem("username", username);
-      localStorage.setItem("email", email);
-      localStorage.setItem("contact", contact);
-      localStorage.setItem("userType", userType);
+      localStorage.setItem("username", storedUser.name);
+      localStorage.setItem("email", storedUser.email);
+      localStorage.setItem("contact", storedUser.phone);
+      localStorage.setItem("token", "local-demo-token"); // Set dummy token to bypass auth checks in farmers.html
 
-      // Redirect based on user type
-      if (userType === "farmer") {
+      // Enforce the registered role!
+      // If they signed up as Farmer, they MUST login as Farmer (or we update their role, but for now stick to signup)
+      // Actually, typically you login with just email/pass and the backend tells you your role.
+      // Here, we trust the storedUser.role
+      const finalRole = storedUser.role || userType;
+      localStorage.setItem("userType", finalRole);
+
+      // Redirect based on FINAL ROLE
+      if (finalRole === "farmer") {
         window.location.href = "farmers.html";
       } else {
         window.location.href = "consumer.html";
