@@ -41,79 +41,70 @@
     document.getElementById("loginForm").addEventListener("submit", async function (event) {
       event.preventDefault();
 
-      const username = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
-      const contact = document.getElementById("contact").value.trim();
       const password = document.getElementById("password").value.trim();
       const userType = document.getElementById("userType").value;
+      // Note: Username and Contact fields in form are visual only if using backend auth which typically uses email/pass.
+      // However, if your specific backend requires them, include them. 
+      // Based on standard authcontroller usually it's email + password. 
+      // The form has username/contact inputs which might be confusing for login vs signup. 
+      // I will assume standard login uses email/password.
 
-      // Email Validation
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(email)) {
-        alert("❌ Please enter a valid Email ID.");
+      if (!email || !password || !userType) {
+        alert("❌ Please fill in all fields.");
         return;
       }
 
-      // Contact Validation (10 digits only)
-      const contactPattern = /^[0-9]{10}$/;
-      if (!contactPattern.test(contact)) {
-        alert("❌ Contact number must be exactly 10 digits.");
-        return;
-      }
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, role: userType })
+        });
 
-      // Password empty check
-      if (password.length === 0) {
-        alert("❌ Password cannot be empty.");
-        return;
-      }
+        const data = await res.json();
 
-      // User Type validation
-      if (userType === "") {
-        alert("❌ Please select user type.");
-        return;
-      }
+        if (data.success) {
+          // 🔒 Security Check: Ensure selected role matches account role
+          // Backend usually returns user object
+          if (userType !== data.role) { // Assuming backend returns role in root or data.user.role
+            // Fallback check if backend structure differs
+            const dataRole = data.role || (data.user && data.user.role);
+            if (dataRole && userType !== dataRole) {
+              alert(`⚠️ Access Denied: This account is registered as a "${dataRole}". Please change "Login as" to "${dataRole}".`);
+              return;
+            }
+          }
 
-      // 🔐 STRICT Local Validation
-      const storedUser = JSON.parse(localStorage.getItem('registeredUser'));
+          // Save token and user info
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userType', data.role);
+          localStorage.setItem('username', data.name);
+          localStorage.setItem('email', data.email);
 
-      if (!storedUser) {
-        alert("❌ No registered user found. Please Sign Up first!");
-        return;
-      }
+          if (data.phone) localStorage.setItem('contact', data.phone);
 
-      if (storedUser.email === email) {
-        if (storedUser.password === password) {
-          // ✅ Success: Login
-          localStorage.setItem("username", storedUser.name);
+          const userObj = {
+            name: data.name,
+            email: data.email,
+            role: data.role,
+            _id: data._id
+          };
+          localStorage.setItem('user', JSON.stringify(userObj));
+
+          alert('Login Successful! ✅');
+
+          if (data.role === 'farmer') {
+            window.location.href = 'farmers.html'; // Navigate to same folder
+          } else {
+            window.location.href = 'consumer.html';
+          }
         } else {
-          // ❌ Wrong Password
-          alert("❌ Incorrect Password!");
-          return;
+          alert(data.error || 'Login failed. Please check your credentials.');
         }
-      } else {
-        // ❌ Wrong Email
-        alert("❌ User not found with this email.");
-        return;
-      }
-
-      // Save session data
-      localStorage.setItem("username", storedUser.name);
-      localStorage.setItem("email", storedUser.email);
-      localStorage.setItem("contact", storedUser.phone);
-      localStorage.setItem("token", "local-demo-token"); // Set dummy token to bypass auth checks in farmers.html
-
-      // Enforce the registered role!
-      // If they signed up as Farmer, they MUST login as Farmer (or we update their role, but for now stick to signup)
-      // Actually, typically you login with just email/pass and the backend tells you your role.
-      // Here, we trust the storedUser.role
-      const finalRole = storedUser.role || userType;
-      localStorage.setItem("userType", finalRole);
-
-      // Redirect based on FINAL ROLE
-      if (finalRole === "farmer") {
-        window.location.href = "farmers.html";
-      } else {
-        window.location.href = "consumer.html";
+      } catch (err) {
+        console.error(err);
+        alert('❌ Error connecting to server. Is the backend running?');
       }
     });
   </script>

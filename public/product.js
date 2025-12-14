@@ -1,66 +1,7 @@
 // ---------------------------------------------------------
 // 1. Fallback Data (Original Full List)
 // ---------------------------------------------------------
-const fallbackFruits = [
-  { name: "Apples", price: "120", image: "images/Apples.jpg", category: "Fruits" },
-  { name: "Bananas", price: "60", image: "images/Bananas.jpg", category: "Fruits" },
-  { name: "Oranges", price: "90", image: "images/Oranges.jpg", category: "Fruits" },
-  { name: "Strawberries", price: "200", image: "images/Strawberries.jpg", category: "Fruits" },
-  { name: "Mangoes", price: "150", image: "images/Mangoes.jpg", category: "Fruits" },
-  { name: "Grapes", price: "100", image: "images/Grapes.jpg", category: "Fruits" },
-  { name: "Pomegranate", price: "180", image: "images/Pomegranate.jpg", category: "Fruits" },
-  { name: "Papaya", price: "60", image: "images/Papaya.jpg", category: "Fruits" },
-  { name: "Kiwi", price: "150", image: "images/Kiwi.jpeg", category: "Fruits" },
-  { name: "Dragon Fruit", price: "200", image: "images/Dragon Fruit.jpg", category: "Fruits" },
-  { name: "Guava", price: "50", image: "images/Guava.jpg", category: "Fruits" },
-  { name: "Peach", price: "180", image: "images/Peach.jpg", category: "Fruits" },
-  { name: "Pear", price: "160", image: "images/Pear.jpg", category: "Fruits" },
-  { name: "Plum", price: "140", image: "images/Plum.jpg", category: "Fruits" },
-  { name: "Apricot", price: "220", image: "images/Apricot.jpg", category: "Fruits" },
-  { name: "Cherry", price: "300", image: "images/Cherry.jpg", category: "Fruits" },
-  { name: "Avocado", price: "400", image: "images/Avocado.jpeg", category: "Fruits" },
-  { name: "Blackberry", price: "350", image: "images/Blackberry.jpg", category: "Fruits" },
-  { name: "Blueberry", price: "450", image: "images/Blueberry.jpg", category: "Fruits" },
-  { name: "Raspberry", price: "400", image: "images/Raspberry.jpg", category: "Fruits" },
-  { name: "Date", price: "300", image: "images/Date.jpg", category: "Fruits" },
-  { name: "Passion Fruit", price: "250", image: "images/Passionfruit.jpg", category: "Fruits" },
-  { name: "Jackfruit", price: "100", image: "images/Jackfruit.jpg", category: "Fruits" },
-  { name: "Melon", price: "70", image: "images/Melon.jpg", category: "Fruits" },
-  { name: "Watermelon", price: "80", image: "images/Watermelon.png", category: "Fruits" },
-  { name: "Pineapple", price: "100", image: "images/Pineapple.png", category: "Fruits" }
-];
-
-const fallbackVeggies = [
-  { name: "Tomatoes", price: "40", image: "images/Tomatoes.jpg", category: "Vegetables" },
-  { name: "Carrots", price: "50", image: "images/Carrots.jpg", category: "Vegetables" },
-  { name: "Onions", price: "45", image: "images/Onions.jpg", category: "Vegetables" },
-  { name: "Potatoes", price: "35", image: "images/Potatoes.jpg", category: "Vegetables" },
-  { name: "Cucumbers", price: "50", image: "images/Cucumbers.jpg", category: "Vegetables" },
-  { name: "Spinach", price: "40", image: "images/Spinach.png", category: "Vegetables" },
-  { name: "Cauliflower", price: "50", image: "images/Cauliflower.png", category: "Vegetables" },
-  { name: "Broccoli", price: "120", image: "images/Broccoli.jpg", category: "Vegetables" },
-  { name: "Beetroot", price: "40", image: "images/Beetroot.jpg", category: "Vegetables" },
-  { name: "Pumpkin", price: "30", image: "images/Pumpkin.jpg", category: "Vegetables" },
-  { name: "Bitter Gourd", price: "35", image: "images/Bitter Gourd.jpg", category: "Vegetables" },
-  { name: "Corn", price: "20", image: "images/Corn.jpg", category: "Vegetables" },
-  { name: "Sweet Potato", price: "40", image: "images/Sweet Patato.jpg", category: "Vegetables" },
-  { name: "Ginger", price: "100", image: "images/Ginger.jpg", category: "Vegetables" },
-  { name: "Garlic", price: "120", image: "images/Garlic.jpg", category: "Vegetables" },
-  { name: "Chili", price: "60", image: "images/Chili.jpg", category: "Vegetables" },
-  { name: "Coriander", price: "20", image: "images/Coriander.jpg", category: "Vegetables" },
-  { name: "Mint", price: "20", image: "images/Mint.jpg", category: "Vegetables" }
-];
-
-const fallbackOthers = [
-  { name: "Fresh Milk", price: "60", image: "images/Milk.png", category: "Other" },
-  { name: "Organic Honey", price: "350", image: "images/Honey.png", category: "Other" },
-  { name: "Farm Eggs", price: "10", image: "images/Eggs.png", category: "Other" },
-  { name: "Cheese", price: "250", image: "images/Cheese.jpeg", category: "Other" },
-  { name: "Butter", price: "280", image: "images/Butter.jpg", category: "Other" },
-  { name: "Pickle", price: "120", image: "images/Pickel.jpg", category: "Other" },
-  { name: "Jam", price: "150", image: "images/Jam.jpg", category: "Other" },
-  { name: "Sauce", price: "100", image: "images/Sauce.jpg", category: "Other" }
-];
+// Fallback data removed - Only Farmer Products are shown.
 
 // Global array to store fetched products for search functionality
 let allProducts = [];
@@ -81,7 +22,8 @@ function displayProducts(data, containerId) {
     // Handle image paths. Uploaded images might need '/uploads/' prefix if not already complete URLs
     let imageSrc = item.image;
     // If it's a local file upload (not a URL and not starting with images/)
-    if (imageSrc && !imageSrc.startsWith('http') && !imageSrc.startsWith('images/') && !imageSrc.startsWith('/uploads/')) {
+    // Fixed: Don't mess with 'data:' URLs (Base64 images from Farmer Upload)
+    if (imageSrc && !imageSrc.startsWith('http') && !imageSrc.startsWith('images/') && !imageSrc.startsWith('/uploads/') && !imageSrc.startsWith('data:')) {
       imageSrc = '/uploads/' + imageSrc;
     }
 
@@ -114,39 +56,25 @@ function displayProducts(data, containerId) {
 }
 
 // Fetch products from Backend with Timeout
+// Fetch products from LocalStorage (Farmer Uploads) or Backend
 async function loadProducts() {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
 
-  try {
-    console.log("Fetching products...");
-    const response = await fetch('/api/products', { signal: controller.signal });
-    const result = await response.json();
+  // 1. Try Loading Farmer Uploads from Local Storage
+  const localData = JSON.parse(localStorage.getItem("farmerProducts")) || [];
 
-    clearTimeout(timeoutId);
-
-    if (result.success && result.data.length > 0) {
-      console.log("Loaded from DB:", result.data);
-      allProducts = result.data;
-    } else {
-      console.warn("DB empty or no success, using fallback data.");
-      throw new Error("Empty DB");
-    }
-  } catch (error) {
-    console.warn('Using fallback data due to:', error.name === 'AbortError' ? 'Timeout' : error.message);
-    allProducts = [...fallbackFruits, ...fallbackVeggies, ...fallbackOthers];
+  if (localData.length > 0) {
+    console.log("Loaded Farmer Products:", localData);
+    allProducts = localData; // 🌟 Use Farmer Data ONLY
+  } else {
+    // 🛑 No Fallback! As requested.
+    console.warn("No farmer products found. Page will be empty.");
+    allProducts = [];
   }
 
   // Categorize and Display
-  const fruits = allProducts.filter(p => p.category === 'Fruits' || (!p.category && fallbackFruits.find(f => f.name === p.name)));
-  const vegetables = allProducts.filter(p => p.category === 'Vegetables' || (!p.category && fallbackVeggies.find(v => v.name === p.name)));
-  const others = allProducts.filter(p => {
-    // In fallback, category is explicit. In mixed list, might be 'Other' or null
-    if (p.category === 'Fruits' || p.category === 'Vegetables') return false;
-    if (fallbackFruits.find(f => f.name === p.name)) return false;
-    if (fallbackVeggies.find(v => v.name === p.name)) return false;
-    return true;
-  });
+  const fruits = allProducts.filter(p => p.category === 'Fruits');
+  const vegetables = allProducts.filter(p => p.category === 'Vegetables');
+  const others = allProducts.filter(p => p.category !== 'Fruits' && p.category !== 'Vegetables');
 
   // Display
   displayProducts(fruits, "fruitsContainer");
@@ -296,10 +224,32 @@ function updateCartBadge() {
 
 // OPEN Quantity Modal
 window.addToCart = function (name, price, category) {
-  selectedItem = { name, price };
-  document.getElementById("qtyModal").style.display = "flex";
-  document.getElementById("qtyInput").value = 1; // Default to 1
-  document.getElementById("qtyInput").focus();
+  // Find Product Stock
+  const product = allProducts.find(p => p.name === name);
+  const maxStock = product && product.stock ? product.stock : 999; // Default large if no stock set
+
+  selectedItem = { name, price, maxStock };
+
+  const modal = document.getElementById("qtyModal");
+  const input = document.getElementById("qtyInput");
+
+  // Create or Update Max Stock Label
+  let stockLabel = document.getElementById("stockLabel");
+  if (!stockLabel) {
+    stockLabel = document.createElement("p");
+    stockLabel.id = "stockLabel";
+    stockLabel.style.fontSize = "14px";
+    stockLabel.style.color = "#555";
+    input.parentNode.insertBefore(stockLabel, input);
+  }
+
+  stockLabel.innerHTML = `Available Stock: <strong>${maxStock}</strong> kg`;
+
+  modal.style.display = "flex";
+
+  input.value = 1;
+  input.max = maxStock; // Set HTML Validation
+  input.focus();
 }
 
 // OK BUTTON – Confirm quantity
@@ -308,6 +258,12 @@ document.getElementById("qtyOkBtn").onclick = function () {
 
   if (!qty || qty <= 0) {
     alert("❌ Enter valid quantity!");
+    return;
+  }
+
+  // 🔒 Stock Validation
+  if (qty > selectedItem.maxStock) {
+    alert(`❌ Only ${selectedItem.maxStock} kg available!`);
     return;
   }
 
@@ -428,6 +384,22 @@ document.getElementById("placeOrderBtn").onclick = function () {
       localStorage.setItem("orderData", JSON.stringify(cart));
       localStorage.setItem("orderTime", new Date().toLocaleString());
       localStorage.setItem("paymentId", response.razorpay_payment_id); // Save payment ID
+
+      // 📜 SAVE TO PERSONAL HISTORY (Persistent)
+      const currentUser = localStorage.getItem("username");
+      if (currentUser) {
+        const historyKey = `orderHistory_${currentUser}`;
+        const currentHistory = JSON.parse(localStorage.getItem(historyKey)) || [];
+
+        currentHistory.push({
+          paymentId: response.razorpay_payment_id,
+          date: new Date().toLocaleString(),
+          amount: totalAmount,
+          items: cart
+        });
+
+        localStorage.setItem(historyKey, JSON.stringify(currentHistory));
+      }
 
       showToast("✅ Payment Successful! Generating Invoice...");
 

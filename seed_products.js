@@ -77,7 +77,8 @@ const seedProducts = async () => {
                 name: 'Default Farmer',
                 email: 'farmer@example.com',
                 password: 'password123',
-                role: 'farmer'
+                role: 'farmer',
+                phone: '1234567890'
             });
         }
 

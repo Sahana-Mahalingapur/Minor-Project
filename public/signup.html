@@ -47,6 +47,11 @@
       const password = document.getElementById("password").value.trim();
       const userType = document.getElementById("userType").value;
 
+      if (!username || !email || !contact || !password || !userType) {
+        alert("❌ Please fill in all fields.");
+        return;
+      }
+
       // Email Validation
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailPattern.test(email)) {
@@ -61,38 +66,59 @@
         return;
       }
 
-      if (password.length === 0) {
-        alert("❌ Password cannot be empty.");
+      if (password.length < 6) {
+        alert("❌ Password must be at least 6 characters.");
         return;
       }
 
-      if (userType === "") {
-        alert("❌ Please select user type.");
-        return;
-      }
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: username,
+            email: email,
+            password: password,
+            phone: contact,
+            role: userType
+          })
+        });
 
-      // Store values for Session
-      localStorage.setItem("username", username);
-      localStorage.setItem("email", email);
-      localStorage.setItem("contact", contact);
-      localStorage.setItem("userType", userType);
-      localStorage.setItem("token", "local-demo-token"); // Set dummy token to bypass auth checks in farmers.html
+        const data = await res.json();
 
-      // 🔐 Store detailed user for Login Validation (matches Login check)
-      localStorage.setItem("registeredUser", JSON.stringify({
-        name: username,
-        email: email,
-        phone: contact,
-        password: password, // In a real app, NEVER save plain text passwords!
-        role: userType
-      }));
+        if (data.success) {
+          // Save Token & User Data
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('username', data.name);
+          localStorage.setItem('email', data.email);
+          localStorage.setItem('contact', data.phone);
+          localStorage.setItem('userType', data.role);
 
-      // Redirect
-      // Redirect based on user type
-      if (userType === "farmer") {
-        window.location.href = "farmers.html";
-      } else {
-        window.location.href = "consumer.html";
+          const userObj = {
+            name: data.name,
+            email: data.email,
+            role: data.role,
+            phone: data.phone,
+            _id: data._id
+          };
+          localStorage.setItem('user', JSON.stringify(userObj));
+
+          alert('Registration Successful! ✅');
+
+          // Redirect
+          if (data.role === 'farmer') {
+            window.location.href = 'farmers.html';
+          } else {
+            window.location.href = 'consumer.html';
+          }
+
+        } else {
+          alert(data.error || data.message || 'Registration failed');
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert('❌ Error connecting to server.');
       }
     });
   </script>
